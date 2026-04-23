@@ -534,6 +534,41 @@
         #fixed-btn2top { bottom: 90px; }
         #fixed-btnread { bottom: 150px; }
 
+        /* Music Player Panel */
+        .music-player-panel {
+            position: fixed;
+            bottom: 210px;
+            right: 15px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(12px);
+            border-radius: 20px;
+            padding: 10px 15px;
+            width: 200px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+            z-index: 998;
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            transform: translateX(220px);
+            transition: transform 0.3s ease;
+        }
+        .music-player-panel.show {
+            transform: translateX(0);
+        }
+        .music-player-panel .music-title {
+            font-size: 0.8rem;
+            font-weight: 600;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin-bottom: 5px;
+        }
+        .music-player-panel audio {
+            width: 100%;
+            height: 32px;
+        }
+        .music-player-panel audio::-webkit-media-controls-panel {
+            background-color: #f5f0e8;
+        }
+
         /* Modal Cover */
         .modal-fullscreen .modal-content {
             background: linear-gradient(135deg, #2c1810, #5c3a2e);
@@ -595,6 +630,9 @@
             .bank-number {
                 font-size: 1rem;
             }
+            .music-player-panel {
+                width: 180px;
+            }
         }
 
         @media (max-width: 480px) {
@@ -628,6 +666,10 @@
             .bank-number {
                 font-size: 0.85rem;
                 word-break: break-all;
+            }
+            .music-player-panel {
+                width: 160px;
+                bottom: 200px;
             }
         }
 
@@ -700,6 +742,19 @@
                 <li data-targetid="#nav-tamu" title="Ucapan"><svg viewBox="0 0 24 24" fill="#8B4513"><path d="M20 2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h14l4 4V4c0-1.1-.9-2-2-2z"/></svg></li>
             </ul>
         </div>
+    </div>
+
+    <!-- Music Player Panel -->
+    <div class="music-player-panel" id="musicPanel">
+        <div class="music-title">
+            <i class="fas fa-music text-gold me-1"></i> 
+            <span id="musicTitle">Lagu Pernikahan</span>
+        </div>
+        <audio id="weddingAudio" controls loop>
+            <!-- GANTI "lagu-pernikahan.mp3" DENGAN NAMA FILE LAGU ANDA -->
+            <source src="lagu.mp3" type="audio/mpeg">
+            Browser Anda tidak mendukung pemutar audio.
+        </audio>
     </div>
 
     <div id="nav-tabContent">
@@ -870,38 +925,25 @@
                 <div class="row justify-content-center g-4">
                     <div class="col-md-8 col-lg-6 scroll-animate fadeRight">
                         <div class="bank-card bank-bri">
-                            <!-- Logo BRI -->
                             <div class="bank-logo">
                                 <i class="fas fa-university fa-3x" style="color: #0A4D8C;"></i>
                             </div>
-                            
-                            <!-- Nama Bank dengan warna BRI -->
                             <div class="bank-name">
                                 <i class="fas fa-building-columns me-2"></i> BANK BRI
                             </div>
-                            
-                            <!-- Nomor Rekening dengan gaya monospace -->
                             <div class="bank-number">
                                 <i class="fas fa-credit-card me-2"></i> 0634 0101 1499 500
                             </div>
-                            
-                            <!-- Nama Pemilik Rekening -->
                             <div class="bank-owner">
                                 <i class="fas fa-user me-2"></i> a.n Andi Ardana S.Milala
                             </div>
-                            
-                            <!-- QR Code -->
                             <div class="qr-code">
                                 <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=BRI%20063401011499500" alt="QR Code BRI" style="width: 100%;">
                             </div>
                             <p class="small text-muted mt-2">Scan QR Code untuk transfer</p>
-                            
-                            <!-- Tombol Copy -->
                             <button class="btn-copy mt-2" onclick="copyToClipboard('0634 0101 1499 500', 'BRI')">
                                 <i class="fas fa-copy me-2"></i> Salin No. Rekening BRI
                             </button>
-                            
-                            <!-- Informasi Tambahan -->
                             <div class="mt-3 pt-2 border-top">
                                 <small class="text-muted">
                                     <i class="fas fa-info-circle me-1"></i> 
@@ -912,7 +954,6 @@
                     </div>
                 </div>
                 
-                <!-- Informasi Tambahan -->
                 <div class="text-center mt-4 scroll-animate zoomIn delay-2">
                     <p class="small text-muted">
                         <i class="fas fa-shield-alt me-1"></i> 
@@ -1013,6 +1054,96 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 <script>
+    // === MUSIC PLAYER SETUP ===
+    // GANTI "lagu-pernikahan.mp3" DENGAN NAMA FILE LAGU ANDA DI BAWAH INI
+    // Contoh: jika nama file lagu Anda adalah "my-wedding-song.mp3", maka ganti menjadi:
+    // const SONG_FILE = "my-wedding-song.mp3";
+    const SONG_FILE = "lagu.mp3";
+    const SONG_TITLE = "Lagu Spesial Pernikahan Kami";
+    
+    // Update audio source dan title
+    const audioElement = document.getElementById('weddingAudio');
+    const musicTitleSpan = document.getElementById('musicTitle');
+    
+    // Set sumber lagu
+    audioElement.querySelector('source').src = SONG_FILE;
+    musicTitleSpan.textContent = SONG_TITLE;
+    audioElement.load(); // Reload audio dengan source baru
+    
+    let isMusicPlaying = false;
+    let musicPanelVisible = false;
+    
+    // Toggle music player panel
+    $('#fixed-btnread').click(function(e) {
+        e.stopPropagation();
+        $('#musicPanel').toggleClass('show');
+        musicPanelVisible = $('#musicPanel').hasClass('show');
+    });
+    
+    // Auto play music after user opens invitation
+    let musicStarted = false;
+    $('.open-invitation').click(function() {
+        // Coba mainkan musik setelah cover ditutup
+        setTimeout(function() {
+            if (!musicStarted) {
+                audioElement.play().then(() => {
+                    isMusicPlaying = true;
+                    musicStarted = true;
+                    $('#fixed-btnread').html('<i class="fas fa-pause text-white fs-5"></i>');
+                    // Tampilkan panel musik sebentar sebagai indikasi
+                    $('#musicPanel').addClass('show');
+                    setTimeout(function() {
+                        if (!musicPanelVisible) {
+                            $('#musicPanel').removeClass('show');
+                        }
+                    }, 3000);
+                }).catch(e => {
+                    console.log('Auto-play perlu interaksi user terlebih dahulu');
+                });
+            }
+        }, 100);
+    });
+    
+    // Handle music play/pause from floating button (bukan panel)
+    let isPausedByButton = false;
+    $('#fixed-btnread').on('click', function(e) {
+        e.stopPropagation();
+        if (musicStarted || !$('#coverModal').is(':visible')) {
+            if (!isMusicPlaying && audioElement.paused) {
+                audioElement.play().then(() => {
+                    isMusicPlaying = true;
+                    $(this).html('<i class="fas fa-pause text-white fs-5"></i>');
+                }).catch(e => console.log('Gagal memutar musik'));
+            } else if (isMusicPlaying && !audioElement.paused) {
+                audioElement.pause();
+                isMusicPlaying = false;
+                $(this).html('<i class="fas fa-music text-white fs-5"></i>');
+            }
+        }
+    });
+    
+    // Sinkronkan status tombol dengan audio
+    audioElement.addEventListener('play', function() {
+        isMusicPlaying = true;
+        $('#fixed-btnread').html('<i class="fas fa-pause text-white fs-5"></i>');
+    });
+    
+    audioElement.addEventListener('pause', function() {
+        isMusicPlaying = false;
+        $('#fixed-btnread').html('<i class="fas fa-music text-white fs-5"></i>');
+    });
+    
+    // Tutup panel jika klik di luar
+    $(document).click(function(e) {
+        if (!$(e.target).closest('#musicPanel').length && !$(e.target).closest('#fixed-btnread').length) {
+            if (musicPanelVisible) {
+                $('#musicPanel').removeClass('show');
+                musicPanelVisible = false;
+            }
+        }
+    });
+    
+    // === EXISTING CODE ===
     // Countdown Timer
     function updateCountdown() {
         const weddingDate = new Date("May 1, 2026 08:00:00").getTime();
@@ -1077,32 +1208,6 @@
         }
         lastScrollTop = scrollTop <= 0 ? 0 : scrollTop;
     });
-    
-    // Background music
-    let isPlaying = false;
-    let audio = new Audio('https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3');
-    audio.loop = true;
-    audio.volume = 0.5;
-    $('#fixed-btnread').click(function() {
-        if(!isPlaying) {
-            audio.play();
-            $(this).html('<i class="fas fa-pause text-white fs-5"></i>');
-            isPlaying = true;
-        } else {
-            audio.pause();
-            $(this).html('<i class="fas fa-music text-white fs-5"></i>');
-            isPlaying = false;
-        }
-    });
-    
-    // Auto-play music after user interaction
-    document.body.addEventListener('click', function() {
-        if(!isPlaying && $('#coverModal').css('display') == 'none') {
-            audio.play().catch(e => console.log('Auto-play prevented'));
-            $('#fixed-btnread').html('<i class="fas fa-pause text-white fs-5"></i>');
-            isPlaying = true;
-        }
-    }, { once: true });
     
     // Form submission
     $('#form-comment').submit(function(e) {
